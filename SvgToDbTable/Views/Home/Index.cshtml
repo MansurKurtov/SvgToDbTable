@@ -1,0 +1,160 @@
+﻿@model IEnumerable<SolutionTestTaskFromMansur.Models.DataBaseModels.EntityModels.PersonalRecord>
+@using AndreyKurdiumov.AspNetCore.Helpers
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "FileToDbTable converting";
+}
+
+@{
+    Layout = null;
+    var grid = new WebGrid(HttpContextAccessor, source:this.Model, defaultSort: "PayrolNumber", rowsPerPage:10);    
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <h2>CSV to DataBase converting task</h2>
+        <h2>UploadFile</h2>
+        @using (Html.BeginForm("FileToDbConvertor", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div>
+                Please select csv file for converting it to postgreSql db table
+                @Html.TextBox("postedFile", "", new { type = "file" }) <br />
+                <input type="submit" value="Send to server" />
+
+            </div>
+        }
+        <br />
+        <h3><strong>@TempData["errorMessage"]</strong></h3>
+        @if (@TempData["addedRowsCount"] != null)
+        {
+        <h3><strong>@TempData["addedRowsCount"]</strong>- rows successfully added</h3>
+        }
+
+        <br />
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a href="#" class="navbar-brand">Search</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    @using (Html.BeginForm("index", "home", FormMethod.Get, new { @class = "navbar-form navbar-left" }))
+                    {
+                        <div class="form-group">
+                            <input type="text" name="search" value="@ViewBag.search" class="form-control" placeholder="search" />
+                        </div>
+                        <button type="submit" value="Search" class="btn btn-success">Search</button>
+                    }
+                </div>
+            </div>
+        </nav>
+        <div>
+            @grid.Table(
+                tableStyle: "table table-responsive table-bordered",
+                columns: grid.Columns(
+                    grid.Column(columnName: "PayrolNumber", header: "Payrol Number"),
+                    grid.Column(columnName: "Forenames", header: "Forenames"),
+                    grid.Column(columnName: "Surname", header: "Surname"),
+                    grid.Column(columnName: "DateOfBirth", header: "DateOfBirth"),
+                    grid.Column(columnName: "Telephone", header: "Telephone")
+                )
+            )
+
+            <div class="row">
+                <div class="col-sm-6">
+                    @grid.Pager(mode: WebGridPagerModes.All)
+                </div>
+            </div>
+
+            @Html.Hidden("dir", grid.SortDirection)
+            @Html.Hidden("col", grid.SortColumn)
+
+        </div>
+    </div>
+    <script src="~/Scripts/jquery-3.1.1.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script>
+        $(function () {
+            try {
+                var dir = $('#dir').val();
+                var col = $('#col').val();
+                var header = $("th a[href*=" + col + "]");
+                if (dir == "Ascending") {
+                    header.text(header.text() + "  ▲")
+                }
+                if (dir == "Descending") {
+                    header.text(header.text() + "  ▼");
+                }
+            } catch (e) {
+            }
+        })
+    </script>
+</body>
+</html>
+
+@*<div class="text-center">
+        <h1 class="display-4">Welcometo my Solution for CSV converting</h1>
+        <br\>
+
+        </br\>
+    </div>
+
+    <h2>UploadFile</h2>
+    @using (Html.BeginForm("FileToDbConvertor", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div>
+            Please select csv file for converting it to postgreSql db table
+            @Html.TextBox("postedFile", "", new { type = "file" }) <br />
+            <input type="submit" value="Send to server" />
+
+        </div>
+    }
+
+    <br\>
+    </br\>
+
+    @if (Model != null)
+    {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["PayrolNumberSortParm"]">@Html.DisplayNameFor(model => model.PayrolNumber)</a>
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PayrolNumber)
+                </th>
+                <th>
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["ForenamesSortParm"]">@Html.DisplayNameFor(model => model.Forenames)</a>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PayrolNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Forenames)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Surname)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    }*@
